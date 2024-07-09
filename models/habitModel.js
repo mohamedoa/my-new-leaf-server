@@ -1,6 +1,5 @@
 import initKnex from "knex";
 import configuration from "../knexfile.js";
-import { response } from "express";
 const knex = initKnex(configuration);
 
 export async function getAllHabits() {
@@ -18,14 +17,6 @@ export async function getAllHabits() {
 
 export async function getHabit(id) {
   try {
-    // const data = await knex
-    //   .select("habits.id", "habit_name", "user_id")
-    //   .from("habits")
-    //   .join("users", "habits.user_id", "users.id")
-    //   .join("progress", "habits.id", "habit_id")
-    //   .where("habits.id", id)
-    //   .first();
-
     const data = await knex.select("*").from("habits").where("id", id).first();
 
     return data;

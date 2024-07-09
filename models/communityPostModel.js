@@ -1,6 +1,5 @@
 import initKnex from "knex";
 import configuration from "../knexfile.js";
-import { response } from "express";
 const knex = initKnex(configuration);
 
 export async function getAllCommunityPosts() {
@@ -39,28 +38,24 @@ export async function createCommunityPost(body) {
 }
 
 export async function updateCommunityPost(id, newData) {
-  const userId = newData.user_id;
-  const userExists = await knex("users").where({ id: userId }).first();
-
-  if (!userExists) {
-    return "User does not exist";
-  }
-
-  if (newData.user_id)
-    try {
-      const response = await knex("posts").where({ id }).update(newData);
-
-      const updatedPost = await knex
-        .select("posts.id", "user_id", "id")
-        .from("posts")
-        .where({ id })
-        .first();
-
-      return updatedPost;
-    } catch (error) {
-      console.error(error);
-      return false;
-    }
+  // const userId = newData.user_id;
+  // const userExists = await knex("users").where({ id: userId }).first();
+  // if (!userExists) {
+  //   return "User does not exist";
+  // }
+  // if (newData.user_id)
+  //   try {
+  //     const response = await knex("posts").where({ id }).update(newData);
+  //     const updatedPost = await knex
+  //       .select("posts.id", "user_id", "id")
+  //       .from("posts")
+  //       .where({ id })
+  //       .first();
+  //     return updatedPost;
+  //   } catch (error) {
+  //     console.error(error);
+  //     return false;
+  //   }
 }
 
 export async function deleteCommunityPost(id) {
