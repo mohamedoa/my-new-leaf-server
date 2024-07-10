@@ -56,15 +56,15 @@ const postCommunityPost = async (req, res) => {
 
 // put/api/communityPosts/:id
 const updatedCommunityPost = async (req, res) => {
-  const newData = req.body;
-  const id = req.params.id;
-  const { user_id, communityPost_name } = newData;
+  const body = req.body;
+  const postId = req.params.id;
+  const { id, post_description, post_likes } = body;
 
-  if (!user_id || !communityPost_name) {
+  if (!user_id) {
     res.status(400).json({
       error: "Missing properties in request body",
       message:
-        "The body needs to be an object with the following keys. user_id and communityPost_name.",
+        "The body needs to be an object with the following keys: user_id",
     });
     return;
   }
