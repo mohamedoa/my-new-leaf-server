@@ -14,9 +14,9 @@ export async function getAllUsers() {
   }
 }
 
-export async function createUserModel(body) {
+export async function createUserModel(newUser) {
   try {
-    const result = await knex("users").insert(body);
+    const result = await knex("users").insert(newUser);
 
     const newUserId = result[0];
     const createdUser = await knex("users").where({ id: newUserId }).first();

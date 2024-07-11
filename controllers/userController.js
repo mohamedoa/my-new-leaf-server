@@ -6,6 +6,10 @@ import {
   getUserHabitModel,
   createUserModel,
 } from "../models/userModel.js";
+import bcrypt from "bcryptjs";
+import initKnex from "knex";
+import configuration from "../knexfile.js";
+const knex = initKnex(configuration);
 
 // get/api/users
 const getAllUsersDetails = async (req, res) => {
@@ -15,7 +19,7 @@ const getAllUsersDetails = async (req, res) => {
     res.status(500).json({ message: "Unable to retrieve users" });
     return;
   }
-
+  delete users.password;
   res.json(users);
 };
 
@@ -29,7 +33,7 @@ const getUserbyId = async (req, res) => {
     });
     return;
   }
-
+  delete user.password;
   res.json(user);
 };
 
@@ -51,25 +55,88 @@ const getUserHabits = async (req, res) => {
   res.json(user);
 };
 
+// export const createUser = async (req, res) => {
+//   const { email, password, name } = req.body;
+
+//   if (!email || !password || !name) {
+//     return res
+//       .status(400)
+//       .send("Please enter all required fields: name, email, address");
+//   }
+
+//   const hashedPassword = bcrypt.hashSync(password);
+
+//   const newUser = {
+//     email,
+//     password: hashedPassword,
+//     name,
+//   };
+
+//   const [createdId] = await knex("user").insert(newUser);
+//   res.status(201).json(createdId);
+// };
+
 // post/api/users
 const createUser = async (req, res) => {
-  if (!req.body.user_name) {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
     res
       .status(400)
       .json({ message: "Please provide information for all input fields" });
     return;
   }
 
-  const newUser = await createUserModel(req.body);
+  const hashedPassword = bcrypt.hashSync(password);
 
-  if (!newUser) {
+  const newUser = {
+    username,
+    password: hashedPassword,
+  };
+
+  const createdUser = await createUserModel(newUser);
+
+  // const [createdId] = await knex("users").insert(newUser);
+  //   res.status(201).json(createdId);
+
+  if (!createdUser) {
     res.status(400).json({
       message: "Could not create user",
     });
     return;
   }
 
-  res.json(newUser);
+  res.status(201).json(createdUser.id);
+};
+
+//
+export const loginUser = async (req, res) => {
+  const { username, password } = req.body;
+
+  if (!username || !password) {
+    return res
+      .status(400)
+      .send("Please enter all required fields: email, password");
+  }
+
+  // Find the user
+  const user = await knex("users").where({ username: username }).first();
+  if (!user) {
+    return res.status(400).send("User does not exist");
+  }
+
+  // Check the password
+  const isPasswordCorrect = bcrypt.compareSync(password, user.password);
+  if (!isPasswordCorrect) {
+    return res.status(400).send("Password is incorrect");
+  }
+
+  // Generate a token
+  const jwtData = { userId: user.id };
+  const token = jwt.sign(jwtData, process.env.JWT_SECRET, {
+    expiresIn: "24h",
+  });
+  res.send(token);
 };
 
 // put/api/users/:id
@@ -111,6 +178,7 @@ export default {
   getAllUsersDetails,
   getUserbyId,
   createUser,
+  loginUser,
   updatedUser,
   removeUser,
   getUserHabits,

@@ -10,6 +10,7 @@ export async function seed(knex) {
       id: 1,
       username: "Anonymous",
       rank: "1",
+      password: "",
     },
   ]);
 }
