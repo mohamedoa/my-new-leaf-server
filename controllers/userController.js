@@ -9,6 +9,7 @@ import {
 import bcrypt from "bcryptjs";
 import initKnex from "knex";
 import configuration from "../knexfile.js";
+import jwt from "jsonwebtoken";
 const knex = initKnex(configuration);
 
 // get/api/users
@@ -122,13 +123,13 @@ export const loginUser = async (req, res) => {
   // Find the user
   const user = await knex("users").where({ username: username }).first();
   if (!user) {
-    return res.status(400).send("User does not exist");
+    return res.status(400).send("Incorrect username or password");
   }
 
   // Check the password
   const isPasswordCorrect = bcrypt.compareSync(password, user.password);
   if (!isPasswordCorrect) {
-    return res.status(400).send("Password is incorrect");
+    return res.status(400).send("Incorrect username or password");
   }
 
   // Generate a token
