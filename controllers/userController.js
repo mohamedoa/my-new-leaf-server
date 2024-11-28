@@ -137,7 +137,7 @@ export const loginUser = async (req, res) => {
   const token = jwt.sign(jwtData, process.env.JWT_SECRET, {
     expiresIn: "24h",
   });
-  res.send(token);
+  res.json({ token: token });
 };
 
 // put/api/users/:id
